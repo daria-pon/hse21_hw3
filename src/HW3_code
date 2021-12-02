@@ -1,0 +1,209 @@
+#Использованные команды на Python
+#Установка
+#HISAT2
+!apt-get update
+!apt-get install hisat2
+!hisat2 --version
+#sra-toolkit установка
+!apt-get install sra-toolkit
+#FastQC установка
+!java -version
+!wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip
+!unzip fastqc_v0.11.9.zip
+!chmod a+x FastQC/fastqc
+!./FastQC/fastqc --help
+#HTSeq-count
+!pip install HTSeq
+!htseq-count --version
+!pip install --upgrade numpy
+#Загрузка перепрограммированных образцов
+#SRR3414629
+!time  fastq-dump  --split-files  SRR3414629
+#SRR3414630
+!time  fastq-dump  --split-files  SRR3414630
+#SRR3414631
+!time  fastq-dump  --split-files  SRR3414631
+#Загрузка контрольных образцов
+#SRR3414635
+!time  fastq-dump  --split-files  SRR3414635
+#SRR3414636
+!time  fastq-dump  --split-files  SRR3414636
+#SRR3414637
+!time  fastq-dump  --split-files  SRR3414637
+#загрузка генома мыши
+!wget https://genome-idx.s3.amazonaws.com/hisat/mm10_genome.tar.gz
+!tar -xzvf mm10_genome.tar.gz
+#аннотация геномов
+!wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/gencode.vM25.annotation.gtf.gz
+!gzip -d gencode.vM25.annotation.gtf.gz
+#Запуск FastQC
+!./FastQC/fastqc  /content/SRR3414629_1.fastq
+!./FastQC/fastqc  /content/SRR3414630_1.fastq
+!./FastQC/fastqc  /content/SRR3414631_1.fastq
+!./FastQC/fastqc  /content/SRR3414635_1.fastq
+!./FastQC/fastqc  /content/SRR3414636_1.fastq
+!./FastQC/fastqc  /content/SRR3414637_1.fastq
+#картирование чтений на геном мыши для SRR3414629
+!time hisat2 -p 3 -x mm10/genome -U SRR3414629_1.fastq -S SRR3414629_1.sam  2>  SRR3414629.hisat
+#из 21106089 чтений 2.82% не выровнялись ни разу, 87.06% выровнялись только 1 раз. 10.11% не уникальных чтений.
+!cat SRR3414629.hisat 
+#отбор уникальных чтений для SRR3414629
+!grep -P '^@|NH:i:1$' SRR3414629_1.sam > SRR3414629.uniq.sam
+#удаление исходного файла для SRR3414629
+!rm -v SRR3414629_1.sam
+#Уникально-картированные чтения SRR3414629, всего 18375888
+!grep -v '^@' SRR3414629.uniq.sam | wc -l
+#подсчет чтений, попавших на каждый из генов SRR3414629
+!time htseq-count --format=sam --stranded=no SRR3414629.uniq.sam  gencode.vM25.annotation.gtf > SRR3414629.counts
+#чтения, соответствующие гену, 1604107 - не соответствуют ни одному гену, 722172 - могут принадлежать разным генам
+#общее число генов, принадлежащих хотя бы 1 гену: 18375888 - 1604107 - 722172 = 16049609
+! grep '^__' SRR3414629.counts
+#картирование чтений на геном мыши для SRR3414630
+!time hisat2 -p 3 -x mm10/genome -U SRR3414630_1.fastq -S SRR3414630_1.sam  2>  SRR3414630.hisat
+#из 15244711 чтений 2.70% не выровнялись ни разу, 86.50% выровнялись только 1 раз. 10.80% не уникальных чтений.
+!cat SRR3414630.hisat 
+#отбор уникальных чтений для SRR3414630
+!grep -P '^@|NH:i:1$' SRR3414630_1.sam > SRR3414630.uniq.sam
+#удаление исходного файла для SRR3414630
+!rm -v SRR3414630_1.sam
+#Уникально-картированные чтения SRR3414630, всего 13186139
+!grep -v '^@' SRR3414630.uniq.sam | wc -l
+#подсчет чтений, попавших на каждый из генов SRR3414630
+!time htseq-count --format=sam --stranded=no SRR3414630.uniq.sam  gencode.vM25.annotation.gtf > SRR3414630.counts
+#чтения, соответствующие гену, 1240295 - не соответствуют ни одному гену, 480520 - могут принадлежать разным генам
+#общее число генов, принадлежащих хотя бы 1 гену: 13186139 - 1240295 - 480520 = 11465324
+! grep '^__' SRR3414630.counts
+#картирование чтений на геном мыши для SRR3414631
+!time hisat2 -p 3 -x mm10/genome -U SRR3414631_1.fastq -S SRR3414631_1.sam  2>  SRR3414631.hisat
+#из 24244069 чтений 2.87% не выровнялись ни разу, 86.33% выровнялись только 1 раз. 10.80% не уникальных чтений.
+!cat SRR3414631.hisat 
+#отбор уникальных чтений для SRR3414631
+!grep -P '^@|NH:i:1$' SRR3414631_1.sam > SRR3414631.uniq.sam
+#удаление исходного файла для SRR3414631
+!rm -v SRR3414631_1.sam
+#Уникально-картированные чтения SRR3414631, всего 20928945
+!grep -v '^@' SRR3414631.uniq.sam | wc -l
+#подсчет чтений, попавших на каждый из генов SRR3414631
+!time htseq-count --format=sam --stranded=no SRR3414631.uniq.sam  gencode.vM25.annotation.gtf > SRR3414631.counts
+#чтения, соответствующие гену, 1700354 - не соответствуют ни одному гену, 819740 - могут принадлежать разным генам
+#общее число генов, принадлежащих хотя бы 1 гену: 20928945 - 1700354 - 819740 = 18408851
+! grep '^__' SRR3414631.counts
+#картирование чтений на геном мыши для SRR3414635
+!time hisat2 -p 3 -x mm10/genome -U SRR3414635_1.fastq -S SRR3414635_1.sam  2>  SRR3414635.hisat
+#из 20956475 чтений 2.68% не выровнялись ни разу, 87.94% выровнялись только 1 раз. 9.39% не уникальных чтений.
+!cat SRR3414635.hisat 
+#отбор уникальных чтений для SRR3414635
+!grep -P '^@|NH:i:1$' SRR3414635_1.sam > SRR3414635.uniq.sam
+#удаление исходного файла для SRR3414635
+!rm -v SRR3414635_1.sam
+#Уникально-картированные чтения SRR3414635, всего 18428317
+!grep -v '^@' SRR3414635.uniq.sam | wc -l
+#подсчет чтений, попавших на каждый из генов SRR3414635
+!time htseq-count --format=sam --stranded=no SRR3414635.uniq.sam  gencode.vM25.annotation.gtf > SRR3414635.counts
+#чтения, соответствующие гену, 1392186 - не соответствуют ни одному гену, 760134 - могут принадлежать разным генам
+#общее число генов, принадлежащих хотя бы 1 гену: 18428317 - 1392186 - 760134 = 16275997
+! grep '^__' SRR3414635.counts
+#картирование чтений на геном мыши для SRR3414636
+!time hisat2 -p 3 -x mm10/genome -U SRR3414636_1.fastq -S SRR3414636_1.sam  2>  SRR3414636.hisat
+#из 20307147 чтений 2.71% не выровнялись ни разу, 87.78% выровнялись только 1 раз. 9.51% не уникальных чтений.
+!cat SRR3414636.hisat 
+#отбор уникальных чтений для SRR3414636
+!grep -P '^@|NH:i:1$' SRR3414636_1.sam > SRR3414636.uniq.sam
+#удаление исходного файла для SRR3414636
+!rm -v SRR3414636_1.sam
+#Уникально-картированные чтения SRR3414636, всего 17825380
+!grep -v '^@' SRR3414636.uniq.sam | wc -l
+#подсчет чтений, попавших на каждый из генов SRR3414636
+!time htseq-count --format=sam --stranded=no SRR3414636.uniq.sam  gencode.vM25.annotation.gtf > SRR3414636.counts
+#чтения, соответствующие гену, 1332692 - не соответствуют ни одному гену, 735108 - могут принадлежать разным генам
+#общее число генов, принадлежащих хотя бы 1 гену: 17825380 - 1332692 - 735108 = 15757580
+! grep '^__' SRR3414636.counts
+#картирование чтений на геном мыши для SRR3414637
+!time hisat2 -p 3 -x mm10/genome -U SRR3414637_1.fastq -S SRR3414637_1.sam  2>  SRR3414637.hisat
+#из 20385570 чтений 2.64% не выровнялись ни разу, 87.54% выровнялись только 1 раз. 9.82% не уникальных чтений.
+!cat SRR3414637.hisat 
+#отбор уникальных чтений для SRR3414637
+!grep -P '^@|NH:i:1$' SRR3414637_1.sam > SRR3414637.uniq.sam
+#удаление исходного файла для SRR3414637
+!rm -v SRR3414637_1.sam
+#Уникально-картированные чтения SRR3414637, всего 17844858
+!grep -v '^@' SRR3414637.uniq.sam | wc -l
+#подсчет чтений, попавших на каждый из генов SRR3414637
+!time htseq-count --format=sam --stranded=no SRR3414637.uniq.sam  gencode.vM25.annotation.gtf > SRR3414637.counts
+#чтения, соответствующие гену, 1397650 - не соответствуют ни одному гену, 710230 - могут принадлежать разным генам
+#общее число генов, принадлежащих хотя бы 1 гену: 17844858 - 1397650 - 710230 = 15736978
+! grep '^__' SRR3414637.counts
+#код для получения общего файла ALL.counts
+a = open('SRR3414635_1.counts', 'r')
+b = open('SRR3414636_1.counts', 'r')
+c = open('ALL.counts', mode = 'a')
+d = open('SRR3414637_1.counts', 'r')
+e = open('SRR3414629_1.counts', 'r')
+f = open('SRR3414630_1.counts', 'r')
+g = open('SRR3414631_1.counts', 'r')
+i = 0
+for line in a:
+  if 'ENSMUSG' in line:
+    i += 1
+a.close()
+a1 = open('SRR3414635_1.counts', mode = 'r')
+while i != 0:
+  line1 = a1.readline()
+  line2 = b.readline()
+  line3 = d.readline()
+  line4 = e.readline()
+  line5 = f.readline()
+  line6 = g.readline()
+  t1 = line1[:line1.index('\n')]
+  t2 = line2[line2.index('	'):line2.index('\n')]
+  t3 = line3[line3.index('	'):line3.index('\n')]
+  t4 = line4[line4.index('	'):line4.index('\n')]
+  t5 = line5[line5.index('	'):line5.index('\n')]
+  t6 = line6[line6.index('	'):]
+  line_f = c.write(t1 + t2 + t3 + t4 + t5 + t6)
+  i = i - 1
+a1.close()
+c.close()
+b.close()
+d.close()
+e.close()
+f.close()
+g.close()
+#Использованные команды на R
+#Установка
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("DESeq2")
+install.packages("pheatmap")
+library("DESeq2")
+library("pheatmap")
+#загрузка файлов
+info   <- read.table("ALL.info", header=TRUE, row.names="sample")
+counts <- as.matrix(read.table("ALL.counts", header=TRUE, row.names="geneID"))
+
+dds <- DESeqDataSetFromMatrix(countData = counts, colData = info, design = ~ condition)
+head(info)
+head(counts)
+dds$condition <- relevel(dds$condition, ref="control")
+
+dds <- DESeq(dds)
+res <- results(dds, alpha=0.01)
+#MAplot
+plotMA(res, ylim=c(-10,10))
+resOrdered <- res[order(res$padj),]
+resSignificant <- subset(resOrdered, padj < 0.01)
+write.table(resSignificant, "differentially_expressed_genes.txt", sep="\t", row.names=TRUE, quote = FALSE)
+#тепловая карта
+rld <- rlog(dds)
+sampleDists <- dist(t(assay(rld)))
+sampleDistMatrix <- as.matrix(sampleDists)
+pheatmap(sampleDistMatrix, clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists)
+#таблица разницы экспрессии генов
+select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
+df <- as.data.frame(colData(dds)[,c("condition","id")])
+pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,cluster_cols=FALSE, annotation_col=df)
+#графики normalized count для генов, наиболее сильно изменивших экспрессию
+res[55,]
+plotCounts(dds, gene=55, intgroup="condition")
+res[5131,]
+plotCounts(dds, gene=5131, intgroup="condition")
